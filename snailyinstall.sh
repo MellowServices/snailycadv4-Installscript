@@ -11,21 +11,30 @@ sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
 
 # Set up database
-database_setup_script="database_setup.sql"
+database_setup_script="database_setuptest"
 cat <<EOF > "$database_setup_script"
 #!/bin/bash
-sudo -u postgres -i
-# Random password
-password_length=12
-rampassworduser=\$LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "\$password_length" | head -n 1
-psql -d postgres
+sudo -u postgres -i <<EOM
+psql -d postgres <<EOSQL
 CREATE USER "snailycad";
 ALTER USER "snailycad" WITH SUPERUSER;
+\q
+EOSQL
+
+password_length=12
+rampassworduser=\$LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "\$password_length" | head -n 1
+
+psql -d postgres <<EOSQL
 ALTER USER "snailycad" PASSWORD '\$rampassworduser';
 CREATE DATABASE "snaily-cadv4";
+\q
+EOSQL
+EOM
 EOF
 
-sudo ./$database_setup_script
+chmod +x database_setuptest
+
+./database_setuptest
 
 sleep 10
 
