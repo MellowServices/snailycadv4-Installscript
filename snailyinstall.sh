@@ -40,7 +40,7 @@ chmod +x database_setuptest
 sleep 10
 
 # Get the IP address
-ip_address=$(ifconfig eth0 | awk '/inet /{print $2}')
+ip_address=$(ifconfig ens18 | awk '/inet /{print $2}')
 
 # Ping check
 ping_result=$(ping -c 1 1.1.1.1)
