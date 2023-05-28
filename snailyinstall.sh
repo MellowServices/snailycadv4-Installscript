@@ -4,13 +4,20 @@
 sudo apt install -y git
 sudo apt update
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install -y net-tools
 sudo apt install -y nodejs
 sudo npm install --global yarn
 sudo apt update && sudo apt install -y postgresql postgresql-contrib
 sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
 
-# Set up database
+
+
+
+# Set up database () STILL NEEDS MAJOR WORK
+rampassworduser=\$LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1
+export rampassworduser
+
 database_setup_script="database_setuptest"
 cat <<EOF > "$database_setup_script"
 #!/bin/bash
@@ -18,26 +25,27 @@ sudo -u postgres -i <<EOM
 psql -d postgres <<EOSQL
 CREATE USER "snailycad";
 ALTER USER "snailycad" WITH SUPERUSER;
-\q
-EOSQL
-
-password_length=12
-rampassworduser=\$LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1
-export rampassworduser
-
-psql -d postgres <<EOSQL
-ALTER USER "snailycad" PASSWORD '\$rampassworduser';
+ALTER USER "snailycad" PASSWORD :'replace_me';
 CREATE DATABASE "snaily-cadv4";
 \q
 EOSQL
 EOM
 EOF
 
+sed -i "s|:'replace_me'|'$rampassworduser'|" "$database_setup_script"
+
+
+# Make the script executable
+chmod +x "$database_setup_script"
+
+# Run the script
+./"$database_setup_script"
+
+
 chmod +x database_setuptest
-
-./database_setuptest
-
 sleep 10
+
+#END Database Setup
 
 # Get the IP address
 ip_address=$(ifconfig ens18 | awk '/inet /{print $2}')
