@@ -13,9 +13,8 @@ sudo systemctl enable postgresql.service
 
 
 
-
-# Set up database () STILL NEEDS MAJOR WORK
-rampassworduser=\$LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1
+# Set up database
+rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export rampassworduser
 
 database_setup_script="database_setuptest"
@@ -25,14 +24,15 @@ sudo -u postgres -i <<EOM
 psql -d postgres <<EOSQL
 CREATE USER "snailycad";
 ALTER USER "snailycad" WITH SUPERUSER;
-ALTER USER "snailycad" PASSWORD :'replace_me';
+ALTER USER "snailycad" PASSWORD '$rampassworduser';
 CREATE DATABASE "snaily-cadv4";
 \q
 EOSQL
 EOM
 EOF
 
-sed -i "s|:'replace_me'|'$rampassworduser'|" "$database_setup_script"
+# Replace the placeholder with the random password
+sed -i "s|ALTER USER \"snailycad\" PASSWORD.*|ALTER USER \"snailycad\" PASSWORD '$rampassworduser';|" "$database_setup_script"
 
 
 # Make the script executable
@@ -40,7 +40,6 @@ chmod +x "$database_setup_script"
 
 # Run the script
 ./"$database_setup_script"
-
 
 chmod +x database_setuptest
 sleep 10
@@ -71,8 +70,9 @@ cp .env.example "$env_file"
 sed -i "s|POSTGRES_DB=\".*\"|POSTGRES_DB=\"snaily-cadv4\"|" "$env_file"
 sed -i "s|POSTGRES_USER=\".*\"|POSTGRES_USER=\"snailycad\"|" "$env_file"
 sed -i "s|POSTGRES_PASSWORD=\".*\"|POSTGRES_PASSWORD=\"$rampassworduser\"|" "$env_file"
-sed -i "s|CORS_ORIGIN_URL=\".*\"|CORS_ORIGIN_URL=\"https://$valid_ip\"|" "$env_file"
-sed -i "s|NEXT_PUBLIC_PROD_ORIGIN=\".*\"|NEXT_PUBLIC_PROD_ORIGIN=\"https://$valid_ip/v1\"|" "$env_file"
+sed -i "s|CORS_ORIGIN_URL=\".*\"|CORS_ORIGIN_URL=\"http://$valid_ip:3000\"|" "$env_file"
+sed -i "s|NEXT_PUBLIC_PROD_ORIGIN=\".*\"|NEXT_PUBLIC_PROD_ORIGIN=\"http://$valid_ip:8080/v1\"|" "$env_file"
+sed -i "s|NEXT_PUBLIC_CLIENT_URL=\".*\"|NEXT_PUBLIC_CLIENT_URL=\"http://$valid_ip:3000\"|" "$env_file"
 
 # Install dependencies
 yarn
