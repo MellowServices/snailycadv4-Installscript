@@ -1,5 +1,16 @@
 #!/bin/bash
 
+
+# Check if script has already run
+if [ -f "/path/to/startup_check.txt" ]; then
+    echo "Script has already run on startup."
+    exit 0
+fi
+
+# Create the startup check file
+touch /path/to/startup_check.txt
+
+
 # Install required packages
 sudo apt install -y git
 sudo apt update
@@ -14,6 +25,7 @@ sudo systemctl enable postgresql.service
 
 
 # Set up database
+
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export rampassworduser
 
@@ -47,7 +59,7 @@ sleep 10
 #END Database Setup
 
 # Get the IP address
-ip_address=$(ifconfig ens18 | awk '/inet /{print $2}')
+ip_address=$(ifconfig eth0 | awk '/inet /{print $2}')
 
 # Ping check
 ping_result=$(ping -c 1 1.1.1.1)
@@ -60,7 +72,8 @@ else
 fi
 
 
-# Clone the repository
+# Clone the 
+cd ~
 git clone https://github.com/SnailyCAD/snaily-cadv4.git
 cd snaily-cadv4
 
@@ -80,4 +93,8 @@ yarn
 # Build the project
 yarn turbo run build --filter="{packages/**/**}" && yarn turbo run build --filter="{apps/**/**}"
 
+npm install pm2 -g
+cd ~/snaily-cadv4/
+
 echo "Setup complete. The .env file has been updated with the necessary information."
+pm2 start npm --name SnailyCADv4 -- run start
