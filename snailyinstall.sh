@@ -2,13 +2,13 @@
 
 
 # Check if script has already run
-if [ -f "/path/to/startup_check.txt" ]; then
+if [ -f "/opt/mellowservices/startup_check.txt" ]; then
     echo "Script has already run on startup."
     exit 0
 fi
 
 # Create the startup check file
-touch /path/to/startup_check.txt
+touch /opt/mellowservices/startup_check.txt
 
 
 # Install required packages
