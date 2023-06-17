@@ -14,7 +14,7 @@ touch /opt/mellowservices/startup_check.txt
 # Install required packages
 sudo apt install -y git
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y net-tools
 sudo apt install -y nodejs
 sudo npm install --global yarn
