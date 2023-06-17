@@ -1,6 +1,8 @@
-# README
+# READ ME
 
 This script is designed to automate the setup process for the SnailyCADv4 project. It installs the necessary packages, sets up a PostgreSQL database, clones the project repository, updates the environment variables, installs dependencies, and builds the project. Finally, it starts the SnailyCADv4 server using PM2.
+
+Thanks to CasperTheGhost for making this amazing CAD! Check him out --> https://github.com/Dev-CasperTheGhost
 
 ## Prerequisites
 
