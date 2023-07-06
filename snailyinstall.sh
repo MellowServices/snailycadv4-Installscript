@@ -1,17 +1,4 @@
 #!/bin/bash
-
-
-# Check if script has already run
-if [ -f "/opt/mellowservices/startup_check.txt" ]; then
-    echo "Script has already run on startup."
-    exit 0
-fi
-
-# Create the startup check file
-touch /opt/mellowservices/startup_check.txt
-
-
-# Install required packages
 sudo apt install -y git
 sudo apt update
 curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
