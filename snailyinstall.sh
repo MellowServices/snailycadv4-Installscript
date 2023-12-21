@@ -1,10 +1,34 @@
 #!/bin/bash
+
+# Check if script has already run
+if [ -f "/opt/mellowservices/startup_check.txt" ]; then
+    echo "Script has already run on startup."
+    if pm2 status SnailyCADv4 | grep -q "online"; then
+        echo "SnailyCAD is already running."
+        exit 0
+    else
+        echo "SnailyCAD is not running."
+        cd ~/snaily-cadv4/
+        pm2 start npm --name SnailyCADv4 -- run start
+        exit 0
+    fi
+fi
+
+
+
+# Install required packages
 sudo apt install -y git
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+NODE_MAJOR=18
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+sudo apt-get update
+sudo apt-get install nodejs -y
 sudo apt install -y net-tools
-sudo apt install -y nodejs
-sudo npm install --global yarn
+npm install -g pnpm
 sudo apt update && sudo apt install -y postgresql postgresql-contrib
 sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
@@ -15,6 +39,9 @@ sudo systemctl enable postgresql.service
 
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export rampassworduser
+
+ramstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
+export ranstring
 
 database_setup_script="database_setuptest"
 cat <<EOF > "$database_setup_script"
@@ -46,7 +73,7 @@ sleep 10
 #END Database Setup
 
 # Get the IP address
-ip_address=$(ifconfig eth0 | awk '/inet /{print $2}')
+ip_address=$(ifconfig ens3 | awk '/inet /{print $2}')
 
 # Ping check
 ping_result=$(ping -c 1 1.1.1.1)
@@ -70,18 +97,20 @@ cp .env.example "$env_file"
 sed -i "s|POSTGRES_DB=\".*\"|POSTGRES_DB=\"snaily-cadv4\"|" "$env_file"
 sed -i "s|POSTGRES_USER=\".*\"|POSTGRES_USER=\"snailycad\"|" "$env_file"
 sed -i "s|POSTGRES_PASSWORD=\".*\"|POSTGRES_PASSWORD=\"$rampassworduser\"|" "$env_file"
+sed -i "s|JWT_SECRET=\".*\"|JWT_SECRET=\"$ranstring\"|" "$env_file"
 sed -i "s|CORS_ORIGIN_URL=\".*\"|CORS_ORIGIN_URL=\"http://$valid_ip:3000\"|" "$env_file"
 sed -i "s|NEXT_PUBLIC_PROD_ORIGIN=\".*\"|NEXT_PUBLIC_PROD_ORIGIN=\"http://$valid_ip:8080/v1\"|" "$env_file"
 sed -i "s|NEXT_PUBLIC_CLIENT_URL=\".*\"|NEXT_PUBLIC_CLIENT_URL=\"http://$valid_ip:3000\"|" "$env_file"
 
 # Install dependencies
-yarn
+pnpm install
 
 # Build the project
-yarn turbo run build --filter="{packages/**/**}" && yarn turbo run build --filter="{apps/**/**}"
+pnpm run build
 
 npm install pm2 -g
 cd ~/snaily-cadv4/
 
+touch /opt/mellowservices/startup_check.txt
 echo "Setup complete. The .env file has been updated with the necessary information."
 pm2 start npm --name SnailyCADv4 -- run start
