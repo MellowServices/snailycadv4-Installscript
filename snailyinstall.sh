@@ -22,11 +22,14 @@ sudo apt-get install -y git ca-certificates curl gnupg net-tools
 NODE_MAJOR=18
 curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | sudo -E bash -
 sudo apt-get install -y nodejs
+apt install net-tools
+
 
 # Install other dependencies
 sudo apt-get install -y pnpm postgresql postgresql-contrib
 sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
+
 
 # Set up database
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
@@ -91,6 +94,9 @@ sed -i "s|JWT_SECRET=\".*\"|JWT_SECRET=\"$ranstring\"|" "$env_file"
 sed -i "s|CORS_ORIGIN_URL=\".*\"|CORS_ORIGIN_URL=\"http://$valid_ip:3000\"|" "$env_file"
 sed -i "s|NEXT_PUBLIC_PROD_ORIGIN=\".*\"|NEXT_PUBLIC_PROD_ORIGIN=\"http://$valid_ip:8080/v1\"|" "$env_file"
 sed -i "s|NEXT_PUBLIC_CLIENT_URL=\".*\"|NEXT_PUBLIC_CLIENT_URL=\"http://$valid_ip:3000\"|" "$env_file"
+
+sudo npm install -g pnpm
+
 
 # Install dependencies
 pnpm install
