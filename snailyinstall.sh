@@ -8,39 +8,31 @@ if [ -f "/opt/mellowservices/startup_check.txt" ]; then
         exit 0
     else
         echo "SnailyCAD is not running."
-        cd ~/snaily-cadv4/
+        cd ~/snaily-cadv4/ || exit 1
         pm2 start npm --name SnailyCADv4 -- run start
         exit 0
     fi
 fi
 
-
-
 # Install required packages
-sudo apt install -y git
-sudo apt update
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+sudo apt-get install -y git ca-certificates curl gnupg net-tools
+
+# Install Node.js
 NODE_MAJOR=18
-echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-sudo apt-get update
-sudo apt-get install nodejs -y
-sudo apt install -y net-tools
-npm install -g pnpm
-sudo apt update && sudo apt install -y postgresql postgresql-contrib
+curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install other dependencies
+sudo apt-get install -y pnpm postgresql postgresql-contrib
 sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
 
-
-
 # Set up database
-
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export rampassworduser
 
-ramstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
+ranstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export ranstring
 
 database_setup_script="database_setuptest"
@@ -60,7 +52,6 @@ EOF
 # Replace the placeholder with the random password
 sed -i "s|ALTER USER \"snailycad\" PASSWORD.*|ALTER USER \"snailycad\" PASSWORD '$rampassworduser';|" "$database_setup_script"
 
-
 # Make the script executable
 chmod +x "$database_setup_script"
 
@@ -70,7 +61,7 @@ chmod +x "$database_setup_script"
 chmod +x database_setuptest
 sleep 10
 
-#END Database Setup
+# END Database Setup
 
 # Get the IP address
 ip_address=$(ifconfig ens3 | awk '/inet /{print $2}')
@@ -85,11 +76,10 @@ else
     echo "Ping failed!"
 fi
 
-
-# Clone the 
-cd ~
+# Clone the repository
+cd ~ || exit 1
 git clone https://github.com/SnailyCAD/snaily-cadv4.git
-cd snaily-cadv4
+cd snaily-cadv4 || exit 1
 
 # Update .env file
 env_file=".env"
@@ -109,7 +99,7 @@ pnpm install
 pnpm run build
 
 npm install pm2 -g
-cd ~/snaily-cadv4/
+cd ~/snaily-cadv4/ || exit 1
 
 touch /opt/mellowservices/startup_check.txt
 echo "Setup complete. The .env file has been updated with the necessary information."
