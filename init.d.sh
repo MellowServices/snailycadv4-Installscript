@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+SERVICE_FILE="/etc/init.d/snailycad"
+
+cat <<EOF | sudo tee "$SERVICE_FILE"
 ### BEGIN INIT INFO
 # Provides:          snailycad
 # Required-Start:    $local_fs $network $remote_fs $syslog
@@ -9,10 +13,6 @@
 # Short-Description: SnailyCAD Startup Script
 ### END INIT INFO
 
-
-SERVICE_FILE="/etc/init.d/snailycad"
-
-cat <<EOF | sudo tee "$SERVICE_FILE"
 [Unit]
 Description=SnailyCAD Startup Script
 
