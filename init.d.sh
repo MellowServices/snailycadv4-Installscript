@@ -1,5 +1,15 @@
 #!/bin/bash
 
+### BEGIN INIT INFO
+# Provides:          snailycad
+# Required-Start:    $local_fs $network $remote_fs $syslog
+# Required-Stop:     $local_fs $network $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: SnailyCAD Startup Script
+### END INIT INFO
+
+
 SERVICE_FILE="/etc/init.d/snailycad"
 
 cat <<EOF | sudo tee "$SERVICE_FILE"
