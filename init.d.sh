@@ -1,6 +1,6 @@
-sudo apt-get update && sudo apt-get install -y dos2unix && sudo mkdir -p /opt/mellowservices && cd /opt/mellowservices && \
+sudo mkdir -p /opt/mellowservices && cd /opt/mellowservices && \
 curl -O https://raw.githubusercontent.com/MellowServices/snailycadv4-Installscript/main/snailyinstall.sh && \
-chmod +x snailyinstall.sh && dos2unix snailyinstall.sh && \
+chmod +x snailyinstall.sh && \
 SCRIPT_PATH="/opt/mellowservices/snailyinstall.sh" && \
 INITD_SCRIPT="/etc/init.d/snailycad" && \
 sudo cp "$SCRIPT_PATH" "$INITD_SCRIPT" && \
