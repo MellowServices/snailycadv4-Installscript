@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Check if script has already run
+if [ -f "/opt/mellowservices/startup_check.txt" ]; then
+    echo "Script has already run on startup."
+    if pm2 status SnailyCADv4 | grep -q "online"; then
+        echo "SnailyCAD is already running."
+        exit 0
+    else
+        echo "SnailyCAD is not running."
+        cd ~/snaily-cadv4/
+        pm2 start npm --name SnailyCADv4 -- run start
+        exit 0
+    fi
+fi
+
+
 # Install Nginx
 sudo apt-get update
 sudo apt-get install -y nginx
