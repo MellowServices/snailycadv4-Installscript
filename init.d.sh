@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-SERVICE_FILE="/etc/init.d/snailycad"
+SERVICE_FILE="/etc/systemd/system/snailycad.service"
 
 cat <<EOF | sudo tee "$SERVICE_FILE"
 ### BEGIN INIT INFO
