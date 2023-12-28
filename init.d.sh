@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE_FILE="/etc/systemd/system/snailycad.service"
+SERVICE_FILE="/etc/init.d/snailycad"
 
 cat <<EOF | sudo tee "$SERVICE_FILE"
 [Unit]
