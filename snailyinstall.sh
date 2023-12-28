@@ -56,9 +56,6 @@ server {
     # Redirect other ports to port 3000
     error_page 497 =301 https://\$host:\$server_port\$request_uri;
 
-    listen 443 ssl; # Assuming you may want to redirect HTTPS traffic as well
-    ssl_certificate /etc/nginx/ssl/nginx.crt;
-    ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
     location /snailycad {
         proxy_pass http://localhost:3000;
