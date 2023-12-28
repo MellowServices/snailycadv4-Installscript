@@ -41,7 +41,7 @@ EOF
 # Create Nginx configuration
 cat <<EOF | sudo tee "$nginx_config"
 server {
-    listen 80;
+    listen 3000;
     server_name localhost;
 
     location / {
