@@ -45,9 +45,20 @@ server {
     server_name localhost;
 
     location / {
-        root /var/www/html;
-        index index.html;
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
     }
+
+    # Redirect other ports to port 3000
+    error_page 497 =301 https://\$host:\$server_port\$request_uri;
+
+    listen 443 ssl; # Assuming you may want to redirect HTTPS traffic as well
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
     location /snailycad {
         proxy_pass http://localhost:3000;
@@ -63,7 +74,6 @@ EOF
 # Enable Nginx site
 sudo ln -s "$nginx_config" "/etc/nginx/sites-enabled/"
 sudo systemctl restart nginx
-
 
 # Check if script has already run
 if [ -f "/opt/mellowservices/startup_check.txt" ]; then
@@ -173,6 +183,6 @@ touch /opt/mellowservices/startup_check.txt
 
 # Remove Nginx configuration
 sudo rm -f "/etc/nginx/sites-enabled/snailycad"
-sudo systemctl restart nginx
+sudo systemctl stop nginx
 echo "Setup complete. The .env file has been updated with the necessary information."
 pm2 start npm --name SnailyCADv4 -- run start
