@@ -25,7 +25,7 @@ sudo apt-get install -y nodejs
 apt install net-tools
 
 # Install other dependencies
-sudo apt-get install -y pnpm postgresql postgresql-contrib
+sudo apt-get install -y postgresql postgresql-contrib
 sudo systemctl start postgresql.service
 sudo systemctl enable postgresql.service
 
