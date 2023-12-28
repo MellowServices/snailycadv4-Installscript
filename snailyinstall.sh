@@ -1,5 +1,70 @@
 #!/bin/bash
 
+# Install Nginx
+sudo apt-get update
+sudo apt-get install -y nginx
+
+# Create Nginx configuration
+nginx_config="/etc/nginx/sites-available/snailycad"
+html_file="/var/www/html/index.html"
+
+# Generate HTML file
+cat <<EOF | sudo tee "$html_file"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Website</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<iframe src="https://scinstall.mellowservices.com"></iframe>
+
+</body>
+</html>
+EOF
+
+# Create Nginx configuration
+cat <<EOF | sudo tee "$nginx_config"
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /var/www/html;
+        index index.html;
+    }
+
+    location /snailycad {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}
+EOF
+
+# Enable Nginx site
+sudo ln -s "$nginx_config" "/etc/nginx/sites-enabled/"
+sudo systemctl restart nginx
+
+
 # Check if script has already run
 if [ -f "/opt/mellowservices/startup_check.txt" ]; then
     echo "Script has already run on startup."
@@ -105,5 +170,9 @@ npm install pm2 -g
 cd ~/snaily-cadv4/ || exit 1
 
 touch /opt/mellowservices/startup_check.txt
+
+# Remove Nginx configuration
+sudo rm -f "/etc/nginx/sites-enabled/snailycad"
+sudo systemctl restart nginx
 echo "Setup complete. The .env file has been updated with the necessary information."
 pm2 start npm --name SnailyCADv4 -- run start
