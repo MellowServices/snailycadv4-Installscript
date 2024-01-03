@@ -123,6 +123,7 @@ export rampassworduser
 ranstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export ranstring
 
+echo "Datbase Start"   
 database_setup_script="database_setuptest"
 cat <<EOF > "$database_setup_script"
 #!/bin/bash
@@ -136,6 +137,8 @@ CREATE DATABASE "snaily-cadv4";
 EOSQL
 EOM
 EOF
+
+echo "Database End"
 
 # Replace the placeholder with the random password
 sed -i "s|ALTER USER \"snailycad\" PASSWORD.*|ALTER USER \"snailycad\" PASSWORD '$rampassworduser';|" "$database_setup_script"
