@@ -114,7 +114,7 @@ apt install net-tools
 # Install other dependencies
 apt-get install -y postgresql postgresql-contrib
 systemctl start postgresql.service
-systemctl enable postgresql.service
+#systemctl enable postgresql.service
 
 # Set up database
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
