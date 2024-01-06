@@ -1,36 +1,46 @@
 #!/bin/bash
 
+# Replace 'snailycad' with your actual service name
+SERVICE_NAME="MSsnailycad"
+SERVICE_SCRIPT="/opt/mellowservices/snailyinstall.sh"
+INIT_SCRIPT="/etc/init.d/$SERVICE_NAME"
 
-SERVICE_FILE="/etc/systemd/system/snailycad.service"
-
-cat <<EOF | sudo tee "$SERVICE_FILE"
+cat <<EOF | sudo tee "$INIT_SCRIPT"
+#!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          snailycad
+# Provides:          $SERVICE_NAME
 # Required-Start:    $local_fs $network $remote_fs $syslog
 # Required-Stop:     $local_fs $network $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: SnailyCAD Startup Script
+# Short-Description: SnailyCAD StartUp Script
 ### END INIT INFO
 
-[Unit]
-Description=SnailyCAD Startup Script
+SERVICE_SCRIPT="$SERVICE_SCRIPT"
 
-[Service]
-Type=simple
-ExecStart=/opt/mellowservices/snailyinstall.sh
-TimeoutStartSec=7200
+case "\$1" in
+    start)
+        echo "Starting \$SERVICE_NAME..."
+        \$SERVICE_SCRIPT start
+        ;;
+    stop)
+        echo "Stopping \$SERVICE_NAME..."
+        \$SERVICE_SCRIPT stop
+        ;;
+    restart)
+        echo "Restarting \$SERVICE_NAME..."
+        \$SERVICE_SCRIPT restart
+        ;;
+    *)
+        echo "Usage: \$0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
 
-[Install]
-WantedBy=default.target
+exit 0
 EOF
-sudo mkdir -p /opt/mellowservices/
+
+# Make the init.d script executable
 sudo curl -o /opt/mellowservices/snailyinstall.sh https://raw.githubusercontent.com/MellowServices/snailycadv4-Installscript/main/snailyinstall.sh
-sudo chmod +x /opt/mellowservices/snailyinstall.sh
-#apt install dos2unix
-#dos2unix /opt/mellowservices/snailyinstall.sh
-
-
-sudo update-rc.d snailycad defaults
-sudo systemctl enable snailycad
-sudo systemctl start snailycad
+sudo chmod +x "$INIT_SCRIPT"
+sudo chmod +x /etc/init.d/MSsnailycad
