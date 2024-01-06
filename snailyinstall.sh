@@ -115,7 +115,7 @@ apt install net-tools
 apt-get install -y postgresql postgresql-contrib
 systemctl start postgresql.service
 systemctl restart packagekit.service
-#systemctl enable postgresql.service
+systemctl enable postgresql.service
 
 # Set up database
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
@@ -125,19 +125,19 @@ ranstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 
 export ranstring
 
 echo "Datbase Start"   
-database_setup_script="database_setuptest"
-cat <<EOF > "$database_setup_script"
-#!/bin/bash
-sudo -u postgres -i <<EOM
-psql -d postgres <<EOSQL
-CREATE USER "snailycad";
-ALTER USER "snailycad" WITH SUPERUSER;
-ALTER USER "snailycad" PASSWORD '$rampassworduser';
-CREATE DATABASE "snaily-cadv4";
-\q
-EOSQL
-EOM
-EOF
+#database_setup_script="database_setuptest"
+#cat <<EOF > "$database_setup_script"
+##!/bin/bash
+#sudo -u postgres -i <<EOM
+#psql -d postgres <<EOSQL
+#CREATE USER "snailycad";
+#ALTER USER "snailycad" WITH SUPERUSER;
+#ALTER USER "snailycad" PASSWORD '$rampassworduser';
+#CREATE DATABASE "snaily-cadv4";
+#\q
+#EOSQL
+#EOM
+#EOF
 
 echo "Database End"
 
