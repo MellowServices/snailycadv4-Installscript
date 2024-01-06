@@ -27,8 +27,8 @@ EOF
 sudo mkdir -p /opt/mellowservices/
 sudo curl -o /opt/mellowservices/snailyinstall.sh https://raw.githubusercontent.com/MellowServices/snailycadv4-Installscript/main/snailyinstall.sh
 sudo chmod +x /opt/mellowservices/snailyinstall.sh
-apt install dos2unix
-dos2unix /opt/mellowservices/snailyinstall.sh
+#apt install dos2unix
+#dos2unix /opt/mellowservices/snailyinstall.sh
 
 
 sudo update-rc.d snailycad defaults
