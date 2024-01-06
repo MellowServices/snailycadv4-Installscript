@@ -16,8 +16,8 @@ fi
 
 
 # Install Nginx
-sudo apt-get update
-sudo apt-get install -y nginx
+apt-get update
+apt-get install -y nginx
 
 # Create Nginx configuration
 nginx_config="/etc/nginx/sites-available/snailycad"
@@ -108,13 +108,13 @@ sudo apt-get install -y git ca-certificates curl gnupg net-tools
 # Install Node.js
 NODE_MAJOR=18
 curl -fsSL https://deb.nodesource.com/setup_$NODE_MAJOR.x | sudo -E bash -
-sudo apt-get install -y nodejs
+apt-get install -y nodejs
 apt install net-tools
 
 # Install other dependencies
-sudo apt-get install -y postgresql postgresql-contrib
-sudo systemctl start postgresql.service
-sudo systemctl enable postgresql.service
+apt-get install -y postgresql postgresql-contrib
+systemctl start postgresql.service
+systemctl enable postgresql.service
 
 # Set up database
 rampassworduser=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
