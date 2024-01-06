@@ -8,12 +8,11 @@ if [ -f "/opt/mellowservices/startup_check.txt" ]; then
         exit 0
     else
         echo "SnailyCAD is not running."
-        cd ~/snaily-cadv4/
+        cd ~/snaily-cadv4/ || exit 1
         pm2 start npm --name SnailyCADv4 -- run start
         exit 0
     fi
 fi
-
 
 # Install Nginx
 apt-get update
@@ -71,7 +70,6 @@ server {
     # Redirect other ports to port 3000
     error_page 497 =301 https://\$host:\$server_port\$request_uri;
 
-
     location /snailycad {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -114,7 +112,6 @@ apt install net-tools
 # Install other dependencies
 apt-get install -y postgresql postgresql-contrib
 systemctl start postgresql.service
-systemctl restart packagekit.service
 systemctl enable postgresql.service
 
 # Set up database
@@ -124,20 +121,20 @@ export rampassworduser
 ranstring=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "12" | head -n 1)
 export ranstring
 
-echo "Datbase Start"   
-#database_setup_script="database_setuptest"
-#cat <<EOF > "$database_setup_script"
-##!/bin/bash
-#sudo -u postgres -i <<EOM
-#psql -d postgres <<EOSQL
-#CREATE USER "snailycad";
-#ALTER USER "snailycad" WITH SUPERUSER;
-#ALTER USER "snailycad" PASSWORD '$rampassworduser';
-#CREATE DATABASE "snaily-cadv4";
-#\q
-#EOSQL
-#EOM
-#EOF
+echo "Database Start"
+database_setup_script="database_setuptest"
+cat <<EOF > "$database_setup_script"
+#!/bin/bash
+sudo -u postgres -i <<EOM
+psql -d postgres <<EOSQL
+CREATE USER "snailycad";
+ALTER USER "snailycad" WITH SUPERUSER;
+ALTER USER "snailycad" PASSWORD '$rampassworduser';
+CREATE DATABASE "snaily-cadv4";
+\q
+EOSQL
+EOM
+EOF
 
 echo "Database End"
 
