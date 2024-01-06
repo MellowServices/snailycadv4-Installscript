@@ -114,6 +114,7 @@ apt install net-tools
 # Install other dependencies
 apt-get install -y postgresql postgresql-contrib
 systemctl start postgresql.service
+systemctl restart packagekit.service
 #systemctl enable postgresql.service
 
 # Set up database
